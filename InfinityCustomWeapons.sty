@@ -1,0 +1,199 @@
+\tikzmath{
+    \infweaponlength=0.9;
+    \infweaponfontsize=8; %5-25
+}
+
+\newcommand{\InfRangeMinusSixColor}[0]{red}
+\newcommand{\InfRangeMinusThreeColor}[0]{red!15!yellow}
+\newcommand{\InfRangePlusZeroColor}[0]{blue!80!green!55}
+\newcommand{\InfRangePlusThreeColor}[0]{black!10!green!90}
+\newcommand{\InfRangePlusSixColor}[0]{black!10!green!90}
+
+\newcommand{\InfWeaponHeader}{
+    \begin{minipage}{\infweaponlength\linewidth}
+        \begin{tikzpicture}[x=0.0345\linewidth,y=1cm]
+            \tikzstyle{every node}=[
+                font=\sffamily\fontsize{\infweaponfontsize pt}{\infweaponfontsize pt}\selectfont,
+                text depth=0]
+            \node at (28,0){};
+            \node[right] at ( 0, 0){Name};
+            \node[right] at ( 4, 0){Range};
+            \node[right] at (11.8, 0){PS};
+            \node[right] at (13.5, 0){B};
+            \node[right] at (15.3, 0){Ammo};
+            \node[right] at (17.6, 0){S. Roll};
+            \node[right] at (20.4, 0){S.N.};
+            \node[right] at (22.9, 0){Traits};
+        \end{tikzpicture}
+    \end{minipage}\\
+}
+
+\newcommand{\InfWeaponProfile}[8]{
+    \begin{minipage}{\infweaponlength\linewidth}
+        \setsepchar{ }
+        \ignoreemptyitems
+        \readlist\rangelist{#2}
+        \begin{tikzpicture}[x=0.0345\linewidth, y=1cm]
+            %\draw(0,0) rectangle(27,1);
+            \tikzstyle{every node}=[
+                font=\sffamily\fontsize{\infweaponfontsize pt}{\infweaponfontsize pt}\selectfont,
+                text depth=0]
+
+            \node at (27,0){}; % Set endpoint for scaling
+            \node[right, scale=0.8] at ( 0, 0.25){
+                \begin{minipage}[t]{0.17\linewidth}
+                    \raggedright
+                    #1
+                \end{minipage}
+            };
+            \foreachitem\x\in\rangelist[] {
+                \node[scale=0.75] at (4.5,0.55){\footnotesize0};\
+                \ifnum\xcnt=1
+                    \node[scale=0.75] at (1.1*\xcnt+4.5,0.55){\footnotesize8};
+                \fi
+                \ifnum\xcnt=2
+                    \node[scale=0.75] at (\xcnt+4.5,0.55){\footnotesize16};
+                \fi
+                \ifnum\xcnt=3
+                    \node[scale=0.75] at (\xcnt+4.5,0.55){\footnotesize24};
+                \fi
+                \ifnum\xcnt=4
+                    \node[scale=0.75] at (\xcnt+4.5,0.55){\footnotesize32};
+                \fi
+                \ifnum\xcnt=5
+                    \node[scale=0.75] at (\xcnt+4.5,0.55){\footnotesize40};
+                \fi
+                \ifnum\xcnt=6
+                    \node[scale=0.75] at (\xcnt+4.5,0.55){\footnotesize48};
+                \fi        
+                \ifnum\xcnt=7
+                    \node[scale=0.75] at (\xcnt+4.5,0.55){\footnotesize96};
+                \fi
+                \ifnum\rangelist[\xcnt]=-6\relax
+                    \fill[\InfRangeMinusSixColor](\xcnt+3.5,0.1) rectangle (\xcnt+4.5,0.4);
+                    \draw[thick](\xcnt+3.5,0.1) rectangle (\xcnt+4.5,0.4);
+                \else
+                    \ifnum\rangelist[\xcnt]=-3\relax
+                        \fill[\InfRangeMinusThreeColor](\xcnt+3.5,0.1) rectangle (\xcnt+4.5,0.4);
+                        \draw[thick](\xcnt+3.5,0.1) rectangle (\xcnt+4.5,0.4);
+                    \else
+                        \ifnum\rangelist[\xcnt]=0\relax
+                            \fill[\InfRangePlusZeroColor](\xcnt+3.5,0.1) rectangle (\xcnt+4.5,0.4);
+                            \draw[thick](\xcnt+3.5,0.1) rectangle (\xcnt+4.5,0.4);
+                        \else
+                            \ifnum\rangelist[\xcnt]=3\relax
+                                \fill[\InfRangePlusThreeColor](\xcnt+3.5,0.1) rectangle (\xcnt+4.5,0.4);
+                                \draw[thick](\xcnt+3.5,0.1) rectangle (\xcnt+4.5,0.4);
+                            \else
+                                \fill[\InfRangePlusSixColor](\xcnt+3.5,0.1) rectangle (\xcnt+4.5,0.4);
+                                \draw[thick](\xcnt+3.5,0.1) rectangle (\xcnt+4.5,0.4);
+                            \fi
+                        \fi
+                    \fi
+                \fi
+                \node[scale=0.8, yscale=0.9] at (\xcnt+4,0.25){\textbf{\rangelist[\xcnt]}};
+            }
+            
+            \node[right] at (12,  0.25){ % PS
+                \begin{minipage}{0.015\linewidth}
+                    \raggedright
+                    #3
+                \end{minipage}
+            };
+            \node[right] at (13.5, 0.25){ % Burst
+                \begin{minipage}{0.02\linewidth}
+                    \raggedright
+                    #4
+                \end{minipage}
+            };
+            \node[right] at (15.3, 0.25){ % Ammo
+                \begin{minipage}{0.1\linewidth}
+                    \raggedright
+                    #5
+                \end{minipage}
+            };
+            \node[right] at (17.6, 0.25){ % S Roll
+                \begin{minipage}{0.1\linewidth}
+                    \raggedright
+                    #6
+                \end{minipage}
+            };
+            \node[right] at (20.7, 0.25){ % S.N.
+                \begin{minipage}{0.02\linewidth}
+                    \raggedright
+                    #7
+                \end{minipage}
+            };
+            \node[right] at (22.9, 0.25){ % Traits
+                \begin{minipage}{0.185\linewidth}
+                    \raggedright
+                    #8
+                \end{minipage}
+            };
+        \end{tikzpicture}
+    \end{minipage}\\
+}
+
+\newcommand{\InfWeaponWithStatblock}[8]{
+    \begin{minipage}{\infweaponlength\linewidth}
+        \setsepchar{ }
+        \ignoreemptyitems
+        \readlist\rangelist{#2}
+        \begin{tikzpicture}[x=0.0345\linewidth, y=1cm]
+            %\draw(0,0) rectangle(27,1);
+            \tikzstyle{every node}=[
+                font=\sffamily\fontsize{\infweaponfontsize pt}{\infweaponfontsize pt}\selectfont,
+                text depth=0]
+
+            \node at (27,0){}; % Set endpoint for scaling
+            \node[right, scale=0.8] at ( 0, 0.25){
+                \begin{minipage}[t]{0.17\linewidth}
+                    \raggedright
+                    #1
+                \end{minipage}
+            };
+            \node[right, scale=0.6] at (4,  0.25){ % Stats
+                \begin{minipage}{0.45\linewidth}
+                    \raggedright
+                    #2
+                \end{minipage}
+            };            
+            \node[right] at (12,  0.25){ % PS
+                \begin{minipage}{0.015\linewidth}
+                    \raggedright
+                    #3
+                \end{minipage}
+            };
+            \node[right] at (13.5, 0.25){ % Burst
+                \begin{minipage}{0.02\linewidth}
+                    \raggedright
+                    #4
+                \end{minipage}
+            };
+            \node[right] at (15.3, 0.25){ % Ammo
+                \begin{minipage}{0.1\linewidth}
+                    \raggedright
+                    #5
+                \end{minipage}
+            };
+            \node[right] at (17.6, 0.25){ % S Roll
+                \begin{minipage}{0.1\linewidth}
+                    \raggedright
+                    #6
+                \end{minipage}
+            };
+            \node[right] at (20.7, 0.25){ % S.N.
+                \begin{minipage}{0.02\linewidth}
+                    \raggedright
+                    #7
+                \end{minipage}
+            };
+            \node[right, scale=0.8] at (22.9, 0.25){ % Traits
+                \begin{minipage}{0.185\linewidth}
+                    \raggedright
+                    #8
+                \end{minipage}
+            };
+        \end{tikzpicture}
+    \end{minipage}\\
+}

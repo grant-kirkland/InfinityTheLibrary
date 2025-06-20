@@ -1,0 +1,267 @@
+\RequirePackage{environ}
+\usetikzlibrary{shadows.blur}
+
+%%% see https://tex.stackexchange.com/a/419101
+%%% see https://tex.stackexchange.com/a/20426
+\makeatletter
+\pgfkeys{%
+  /tikz/on layer/.code={
+    \pgfonlayer{#1}\begingroup
+    \aftergroup\endpgfonlayer
+    \aftergroup\endgroup
+  },
+  /tikz/node on layer/.code={
+    \gdef\node@@on@layer{%
+      \setbox\tikz@tempbox=\hbox\bgroup\pgfonlayer{#1}\unhbox\tikz@tempbox\endpgfonlayer\egroup}
+    \aftergroup\node@on@layer
+  },
+  /tikz/end node on layer/.code={
+    \endpgfonlayer\endgroup\endgroup
+  }
+}
+\def\node@on@layer{\aftergroup\node@@on@layer}
+\makeatother
+%%%
+
+\definecolor{InfStatBackground}{rgb}{0.9, 0.9, 0.9} 
+\definecolor{InfSkillsBackground}{rgb}{0.05, 0.35, 0.05} 
+
+\newcommand{\InfProfileAriadna}{
+    \definecolor{InfNameplateBackground}{RGB}{60, 124, 50}
+    \definecolor{InfSkillsBackground}{RGB}{50, 88, 45}
+}
+\definecolor{InfNameplateBackground}{RGB}{70, 124, 50}
+
+\definecolor{InfLineColor}{RGB}{168, 218, 236}
+\definecolor{InfHeaderColor1}{RGB}{41, 72, 114}
+\definecolor{InfHeaderColor2}{RGB}{96, 119, 161}
+
+\newcounter{InfTroopCounter}
+\newcounter{InfProfileCounter}[InfTroopCounter]
+
+\newcommand*{\infdot}[0]{
+    \begin{tikzpicture}
+        \useasboundingbox (0,0) rectangle (0.05,0);
+        \draw[fill, white](-0.4,-0.9) circle (0.35);
+    \end{tikzpicture}
+}
+
+\pgfdeclarehorizontalshading{InfHeaderGradient}{100bp}{
+    color(0bp)=(InfHeaderColor1);
+    color(25bp)=(InfHeaderColor1);
+    color(50bp)=(InfHeaderColor2);
+    color(75bp)=(InfHeaderColor1);
+    color(100bp)=(InfHeaderColor1)
+}
+
+\tikzmath{
+    \infunitlength=0.9;
+    \infweaponfontsize=8; %5-25
+}
+
+
+\NewEnviron{InfUnitBlock}{
+    \begin{minipage}{\infunitlength\linewidth}
+        \pgfdeclarelayer{background}
+        \pgfdeclarelayer{nameplate}
+        \pgfdeclarelayer{icons}
+        \pgfdeclarelayer{skills}
+        \pgfdeclarelayer{textlayer}
+        \pgfsetlayers{background, nameplate, main, icons, skills, textlayer}
+    \setcounter{InfTroopCounter}{0}
+    \setcounter{InfProfileCounter}{0}
+    
+    \begin{tikzpicture}[
+        x=0.01\linewidth, y=-0.01\linewidth,
+        background/.style={on layer=background},
+        nameplate/.style={on layer=nameplate},
+        icons/.style={on layer=icons},
+        main/.style={layer=main},
+        isc/.style={layer=isc},
+        skills/.style={layer=skills},
+        textlayer/.style={on layer=textlayer}]
+
+        
+        \tikzstyle{every node}=[
+            font=\sffamily
+            ];
+            
+        \coordinate(REF) at (0, 0);
+
+%        \draw[color=white, fill=blue] (1.4, 1.4) rectangle ++(97, 3);
+
+        \BODY
+
+%        \coordinate(Name) at (22.8, 13.1);
+
+    
+%        \node[anchor=north west, opacity=0.4] at (-1, -1) {\includegraphics[width=\linewidth]{Image/IA-rokot.png}};
+%        \node[anchor=north west, opacity=0.35] at (-1, -1) {\includegraphics[width=\linewidth]{Image/IA-warcor.png}};
+%        \node[anchor=north west, opacity=0.4] at (-1, -1) {\includegraphics[width=\linewidth]{Image/IA-chernobog.png}};
+        \draw[background, color=InfLineColor, fill=black, rounded corners] (REF)++(100,0) rectangle  (0, 0);
+
+    \end{tikzpicture}
+    
+    \end{minipage}
+}
+
+\newcommand{\InfTeamHeader}[2]{
+    \node[white, anchor=west, scale=0.9, xscale=0.94, shift={(0.6, 1.9)}] at (REF){ISC: #1};
+    \node[white, anchor=west, scale=1.07, shift={(0.4, 4.8)}] at (REF){#2};
+    \draw[InfLineColor](REF) ++(0, 7) -- ++(100, 0);
+    %\draw(REF) ++(0, 7) node[coordinate](REF){};
+    \node[coordinate, shift={(0, 7)}](REF) at (REF){};
+}
+
+\newcommand{\InfUnitDesignators}[7]{
+    \stepcounter{InfTroopCounter}
+    \setsepchar{ }
+    \ignoreemptyitems
+    \readlist\factionlist{#5}
+    \readlist\iconlist{#6}
+    % ISC Name box
+    \draw[color=white, shading=InfHeaderGradient] (REF) ++(1.35, 1.38) rectangle ++(96.95, 3.19);
+    % ISC name
+    \node[white, anchor=west, scale=0.83, xscale=1.006, shift={(2.16, 3.73)}] at (REF){ISC: #1};
+    % Troop type
+    \node[textlayer, white, anchor=east, scale=0.83, xscale=1.012, shift={(116.54, 3.8)}] at (REF){#3};
+
+    \foreachitem\x\in\factionlist[] {
+        \ifnum\xcnt=27
+            \node[anchor=north west, shift={(97.5-\xcnt*3.521, 5.14)}] at (REF) {\includegraphics[width=0.0285\linewidth]{FactionLogos/\x.png}};
+            \node[coordinate, shift={(0,3.15)}](REF) at (REF){};
+        \fi
+        \ifnum\xcnt<27
+                \node[anchor=north west, shift={(97.5-\xcnt*3.521, 5.14)}] at (REF) {\includegraphics[width=0.0285\linewidth]{FactionLogos/\x.png}};
+        \fi
+        \ifnum\xcnt>27
+                \node[anchor=north west, shift={(192.567-\xcnt*3.521, 5.14)}] at (REF) {\includegraphics[width=0.0285\linewidth]{FactionLogos/\x.png}};
+        \fi
+    }
+    
+    % Unit icons
+    \foreachitem\x\in\iconlist[] {
+        \node[icons, anchor=north west, shift={(1, 7.85+4.8*\xcnt)}] at (REF) {\includegraphics[width=0.043\linewidth]{icons/\x.png}};
+    }
+
+    % Name background
+    \node[textlayer, white, scale=0.9, shift={(4.74, 13.11)}] at (REF){#4};
+    \draw[nameplate, fill=InfNameplateBackground](REF) ++(7.2, 13) -- ++(2.8, -2.8) -- ++(84.4, 0) -- ++(2.8, 2.8) -- ++(0, 4) -- ++(-73.8, 0) -- ++(0, 10.2) -- ++(-13.4, 0) -- ++(-2.8, -2.8);
+    % Unit name
+    \node[textlayer, anchor=west, black, scale=1.075, opacity=0.1, shift={(21.55, 12.5)}] at (REF){\textbf{#2}};
+    \node[textlayer, anchor=west, black, scale=1.075, opacity=0.1, shift={(21.4, 12.65)}] at (REF){\textbf{#2}};
+    \node[textlayer, anchor=west, black, scale=1.075, opacity=0.2, shift={(21.55, 12.65)}] at (REF){\textbf{#2}};
+    \node[textlayer, anchor=west, black, scale=1.075, opacity=0.1, shift={(21.6, 12.7)}] at (REF){\textbf{#2}};
+    \node[textlayer, anchor=west, white, scale=1.075, shift={(21.4, 12.5)}] at (REF){\textbf{#2}};
+    
+    \node[icons, shift={(15.4, 18.6)}] at (REF) {\includegraphics[width=0.125\linewidth]{#7}};
+
+    \draw[nameplate, rounded corners, fill=InfSkillsBackground, color=InfSkillsBackground, blur shadow={shadow blur steps=10, shadow yshift=0.15em, shadow blur radius=0.5em, shadow opacity=100}] (REF)  ++(15.7, 15.8) rectangle ++(81, 9.8);
+    
+
+    \node[coordinate, shift={(0,0)}](REF) at (REF){};
+
+}
+
+\newcommand{\InfUnitStats}[3]{
+    \draw[nameplate, rounded corners, fill=InfStatBackground, color=InfStatBackground,           blur shadow={shadow blur steps=10, shadow yshift=0.15em, shadow blur radius=0.5em, shadow opacity=100}] (REF)  ++(16, 15.8) rectangle ++(82, 6.2);
+    \draw(REF) ++(22.4, 18.9) -- ++(71.6, 0);
+    \setsepchar{ }
+    \ignoreemptyitems
+    \readlist\statlist{#1}
+    %MOV
+    \node[textlayer, scale=0.85, shift={(31.7, 20.55)}] at (REF){\textbf{MOV}}; 
+    \node[textlayer, scale=0.85, shift={(31.75, 23.7)}] at (REF){\textbf{\statlist[1]}};
+    
+    %CC
+    \node[textlayer, scale=0.85, shift={(40.8, 20.55)}] at (REF){\textbf{CC}}; 
+    \node[textlayer, scale=0.85, shift={(40.9, 23.7)}] at (REF){\textbf{\statlist[2]}};
+    
+    %BS
+    \node[textlayer, scale=0.85, shift={(49.2, 20.55)}] at (REF){\textbf{BS}}; 
+    \node[textlayer, scale=0.85, shift={(49.2, 23.7)}] at (REF){\textbf{\statlist[3]}};
+    
+    %PH
+    \node[textlayer, scale=0.85, shift={(57.4, 20.55)}] at (REF){\textbf{PH}}; 
+    \node[textlayer, scale=0.85, shift={(57.4, 23.7)}] at (REF){\textbf{\statlist[4]}};
+    
+    %WIP
+    \node[textlayer, scale=0.85, shift={(65.8, 20.55)}] at (REF){\textbf{WIP}}; 
+    \node[textlayer, scale=0.85, shift={(65.8, 23.7)}] at (REF){\textbf{\statlist[5]}};
+    
+    %ARM
+    \node[textlayer, scale=0.85, shift={(74.1, 20.55)}] at (REF){\textbf{ARM}}; 
+    \node[textlayer, scale=0.85, shift={(74.1, 23.7)}] at (REF){\textbf{\statlist[6]}};
+
+    %BTS
+    \node[textlayer, scale=0.85, shift={(82.2, 20.55)}] at (REF){\textbf{BTS}}; 
+    \node[textlayer, scale=0.85, shift={(82.2, 23.7)}] at (REF){\textbf{\statlist[7]}};
+    
+    %VITA
+    \node[textlayer, scale=0.85, shift={(90.6, 20.55)}] at (REF){\textbf{VITA}}; 
+    \node[textlayer, scale=0.85, shift={(90.6, 23.7)}] at (REF){\textbf{\statlist[8]}};
+
+    %S
+    \node[textlayer, scale=0.85, shift={(98.9, 20.55)}] at (REF){\textbf{S}}; 
+    \node[textlayer, scale=0.85, shift={(98.9, 23.7)}] at (REF){\textbf{\statlist[9]}};
+
+    %AVA
+    \node[textlayer, scale=0.85, shift={(107.2, 20.55)}] at (REF){\textbf{AVA}}; 
+    \node[textlayer, scale=0.85, shift={(107.2, 23.7)}] at (REF){\textbf{\statlist[10]}};
+
+    % \node[white, anchor=west, scale=0.83, xscale=1.006, shift={(2.16, 3.73)}] at (REF){Equipment: #2};
+    % \node[white, anchor=west, scale=0.83, xscale=1.006, shift={(2.16, 3.73)}] at (REF){Special Skills: #3};
+
+%    
+}
+
+\newcommand{\InfUnitSkillsEquipment}[2]{
+    \setsepchar{,}
+    \ignoreemptyitems
+    \readlist\skilllist{#1}
+    \readlist\equiplist{#2}
+
+    \ifnum\skilllistlen>0
+        \node[textlayer, anchor=north west, white, scale=0.65, shift={(35.2, 34.9)}] at (REF){\textbf{Special Skills:}};
+    \fi
+    \ifnum\skilllistlen=1
+        \node[textlayer, anchor=north west, white, scale=0.65, shift={(52.0, 34.9)}] at (REF){#1};
+    \fi
+    \ifnum\skilllistlen>1
+        \foreachitem\skill\in\skilllist[] {
+        }
+        \node[textlayer, anchor=north west, white, scale=0.65, shift={(52.0, 34.9)}] at (REF){#1};
+    \fi
+
+}
+\newcommand{\InfUnitPicture}[0]{}
+
+\newcommand{\InfUnitProfile}[0]{
+    \stepcounter{InfProfileCounter}
+
+    \ifnum\theInfProfileCounter=1
+        %\draw[nameplate, rounded corners, fill=InfStatBackground, color=black, blur shadow={shadow blur steps=10, shadow yshift=0.15em, shadow blur radius=0.5em, shadow opacity=100}] (REF)  ++(7, 28.6) rectangle ++(91.5, 2.85);
+        \draw[nameplate, fill=blue, color=white, blur shadow={shadow blur steps=10, shadow yshift=0.15em, shadow blur radius=0.5em, shadow opacity=100}] (REF)  ++(7, 29.5) 
+        arc[start angle=180, end angle=270, radius=1]
+        -- ++(89.5, 0) 
+        arc[start angle=-90, end angle=0, radius=1]
+        -- ++(0, 2)
+         -| cycle;
+    \fi
+        \draw[nameplate, fill=blue, color=white, blur shadow={shadow blur steps=10, shadow yshift=-1.15em, shadow blur radius=0.5em, shadow opacity=100}] (REF)  ++(9, 31.5) 
+%        arc[start angle=180, end angle=270, radius=1]
+        -- ++(89.5, 0) 
+        -- ++(0, 1.5)
+        arc[start angle=0, end angle=90, radius=1]
+        -- ++(-89.5, 0) 
+        arc[start angle=90, end angle=180, radius=1]
+         |- cycle;
+    
+
+    
+        \node[coordinate, shift={(0,57.1)}](REF) at (REF){};
+} 
+
+\newcommand{\InfUnitTeamProfile}[0]{}
+
+\newcommand{\InfUnitNotes}[0]{}

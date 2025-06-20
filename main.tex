@@ -1,0 +1,83 @@
+\documentclass[]{article}
+\usepackage{graphicx} % Required for inserting images
+\usepackage[weapons]{infinitythelibrary}
+\usepackage[margin=1in]{geometry}
+\usepackage{helvet}
+\renewcommand*\familydefault{\sfdefault} %% Only if the base font of the document is to be sans serif
+\usepackage[T1]{fontenc}
+\usepackage{amsmath}
+\usepackage{changepage}
+
+\title{InfLibrary - V0.1}
+\author{Falx - V0116}
+\date{December 2024}
+
+
+\begin{document}
+
+\maketitle
+\fontfamily{phv}\selectfont
+
+\section{Weapons}
+
+\InfWeaponHeader
+\InfWeaponWithStatblock{Armed Turret}{CC=5, BS=10, ARM=2, BTS=3, STR=1, S=2, Equip: 360 Visor, Skills: Total Reaction, CCW: PARA CC Weapon (-3)}{6}{2}{N}{ARM}{1}{}
+\InfWeaponProfile{Armed Turret (Pitcher)}{0 0 0 -3 -6 -6}{-}{1}{ }{-}{1}{Speculative Attack, Disposable (2), Indescriminate, Non-lethal, Targetless, [*]}
+\\\\
+\Discover
+\PARACCWeapon
+\InfWeaponProfile{PARA + DA CC Weapon}{ }{8}{1}{\tiny PARA+DA}{PH-2}{2}{CC, Non-lethal, State: IMM-A}
+
+\section{Profiles}
+
+% ROKOT
+\begin{InfUnitBlock}
+    \InfProfileAriadna
+    \InfUnitDesignators{Rokots}{ROKOTS}{Line Troops}{LI}{kosmo Ariadna}{regular}{Image/rokots.png}
+    \InfUnitStats{4-4 14 10 18 13 8 6 1 2 5}{}{}
+    \InfUnitSkillsEquipment{Courage}{ }
+    \InfUnitProfile{}
+    
+    \node[anchor=north west, opacity=0.35] at (-1, -1) {\includegraphics[width=\linewidth]{Image/IA-rokot.png}};
+\end{InfUnitBlock}
+
+POLARIS TEAM
+
+\begin{InfUnitBlock}
+    \InfProfileAriadna
+    \InfTeamHeader{Polaris Team}{POLARIS TEAM}
+    \InfUnitDesignators{Masha, Polaris Handler}{MASHA, Polaris Handler}{Support Troops}{LI}{kosmo Ariadna}{regular}{Image/polaris.png}
+    \InfUnitStats{4-4 14 11 11 13 2 0 1 2 2}{}{}
+    %\InfUnitSkillsEquipment{}{}
+    \InfUnitProfile{}
+    \InfUnitDesignators{Polaris Bearpode}{POLARIS BEARPODE}{Support Troops}{WB}{kosmo Ariadna}{regular}{Image/polaris.png}
+    \InfUnitStats{6-4 24 7 16 12 4 3 2 6 2}{}{}
+    \InfUnitSkillsEquipment{Berserk \infdot Climbing Plus \infdot Courage \infdot Dogged \infdot Immunity ( ARM ) \infdot No Cover}{ }
+    \InfUnitProfile{}
+    \node[anchor=north west, opacity=0.35] at (-1, -1) {\includegraphics[width=\linewidth]{Image/IA-polaris.png}};
+
+\end{InfUnitBlock}
+
+WARCOR
+
+\begin{InfUnitBlock}
+    \InfProfileAriadna
+    \InfUnitDesignators{Warcors, War Correspondents}{WARCORS, WAR CORRESPONDENTS}{Mercenary Troops}{LI}{wc dahshat ikari druze oss steel aleph tunguska bakunin corregidor nomads ramah qk hassassin haqq kosmo tartary usarf ariadna wb invincible imperial yj kcf wf mo pano oban shindenbutai jsa torchlight starmada o12}{cube irregular}{Image/warcors.png}
+    \InfUnitStats{4-4 11 9 11 18 0 0 1 2 1}{}{}
+    \InfUnitSkillsEquipment{Journalist L1}{ }
+    \InfUnitProfile{}
+    \node[anchor=north west, opacity=0.35] at (-1, -1) {\includegraphics[width=\linewidth]{Image/IA-warcor.png}};
+
+\end{InfUnitBlock}
+
+%\InfUnitProfile{ROKOTS}{}{Courage}{Image/rokots.png}
+
+% \section{Weapons}
+
+% \InfWeaponHeader
+% \APCCWeapon
+% \BreakerCombiRifle
+% \APSniperRifle
+% \ArmedTurret
+
+\end{document}

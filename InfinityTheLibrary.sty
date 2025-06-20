@@ -1,0 +1,25 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{infinitythelibrary}[2024/12/17 Fan-made Infinity LaTeX library]
+
+\RequirePackage{listofitems}
+\RequirePackage{tikz}
+\RequirePackage{xcolor}
+\usetikzlibrary{math} 
+\usepackage{tabularray}
+\usepackage{pdfpages}
+\usepackage{grffile}
+\usepackage{qrcode}
+\usepackage{pdflscape}
+\usepackage{ifthen}
+
+
+
+\input{InfinityCustomWeapons.sty}
+\input{InfinityCustomProfiles.sty}
+
+
+
+\DeclareOption{weapons} {
+    \input{InfinityWeapons.sty}
+}
+\ProcessOptions\relax
