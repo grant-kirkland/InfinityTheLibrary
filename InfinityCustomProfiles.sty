@@ -91,6 +91,9 @@
         \coordinate(REF) at (0, 0);
 
         \BODY
+        
+        \node[coordinate, shift={(0,57.1)}](REF) at (REF){};
+
     
         \draw[background, color=InfLineColor, fill=black, rounded corners] (REF)++(100,0) rectangle  (0, 0);
 
@@ -237,10 +240,9 @@
 \newcommand{\InfUnitPicture}[0]{}
 
 % Adds profiles to the unit block. 
-%TODO create reference that updates with each profile. 
-% square corners of previous profile if counter is greater than 1
-% profile length size handling
-\newcommand{\InfUnitProfile}[0]{
+%TODO profile length size handling for all text fields
+% check even vs odd for profile coloring
+\newcommand{\InfUnitProfile}[5]{
     \stepcounter{InfProfileCounter}
 
     \ifnum\theInfProfileCounter=1
@@ -262,22 +264,44 @@
         \node[textlayer, white, scale=0.71, shift={(104.8, 42.5)}] at (REF){Melee Weapons}; 
         \node[textlayer, white, scale=0.71, shift={(128, 42.1)}] at (REF){SWC}; 
         \node[textlayer, white, scale=0.71, shift={(135.5, 42.1)}] at (REF){C}; 
-
+        \node[coordinate, shift={(9,31.5)}](ProfREF) at (REF){};
+    \fi
+    \ifnum\theInfProfileCounter>1
+        \draw[nameplate, shading=InfHeaderGradient, draw=none, blur shadow={shadow blur steps=10, shadow yshift=-1.15em, shadow blur radius=0.5em, shadow opacity=100}] (ProfREF)  ++(-2, 0) 
+        -- ++(91.5, 0) 
+        -- ++(0, 2.5)
+        -- ++(-91.5, 0) 
+        |- cycle;
+        \draw[nameplate, color=InfProfileOutline] (ProfREF) ++(-2, 0) -- ++(0, 2.5);
+        \draw[nameplate, color=InfProfileOutline] (ProfREF) ++(89.5, 0) -- ++(0, 2.5);
+        \node[coordinate, shift={(0,2.5)}](ProfREF) at (ProfREF){};
+        
     \fi
     
-    \draw[nameplate, fill=blue, color=white, blur shadow={shadow blur steps=10, shadow yshift=-1.15em, shadow blur radius=0.5em, shadow opacity=100}] (REF)  ++(9, 31.5) 
+    \node[textlayer, white, scale=0.65, anchor=north west,  name=NameText, shift={(-2.1, 0)}] at (ProfREF){#1}; 
+    \node[textlayer, white, scale=0.65, anchor=north west,  name=WeaponText, shift={(36.2, 0)}] at (ProfREF){#2}; 
+    \node[textlayer, white, scale=0.65, yscale=0.92, text width=4.5cm, anchor=north west, name=MeleeText, shift={(90.5, 0)}] at (ProfREF){#3}; 
+    \node[textlayer, white, scale=0.65, anchor=north west, shift={(124.3, 0)}] at (ProfREF){#4}; 
+    \node[textlayer, white, scale=0.65, anchor=north west, shift={(133, 0)}] at (ProfREF){#5}; 
+
+    \path let
+      \p1 = (MeleeText.north),
+      \p2 = (MeleeText.south)
+    in
+      coordinate (ProfREF) at ($(ProfREF)+(0,\y2-\y1+11)$);    
+
+    \draw[nameplate, shading=InfHeaderGradient, color=black, draw=none, blur shadow={shadow blur steps=10, shadow yshift=-1.15em, shadow blur radius=0.5em, shadow opacity=100}] (ProfREF)  ++(0, -1.5) 
     -- ++(89.5, 0) 
-    -- ++(0, 1.5)
+    -- ++(0, 3)
     arc[start angle=0, end angle=90, radius=1]
     -- ++(-89.5, 0) 
     arc[start angle=90, end angle=180, radius=1]
      |- cycle;
 
-
-    
-        \node[coordinate, shift={(0,57.1)}](REF) at (REF){};
+    \draw[nameplate, color=InfProfileOutline] (ProfREF) ++(-2, -1.5) -- ++(0, 3) arc[start angle=180, end angle=90, radius=1] -- ++(89.5, 0) arc[start angle=90, end angle=0, radius=1] -- ++(0, -3);    
 } 
 
 \newcommand{\InfUnitTeamProfile}[0]{}
 
-\newcommand{\InfUnitNotes}[0]{}
+\newcommand{\InfUnitNotes}[0]{        
+}
