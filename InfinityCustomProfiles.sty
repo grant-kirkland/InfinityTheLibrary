@@ -35,6 +35,7 @@
 \definecolor{InfLineColor}{RGB}{168, 218, 236}
 \definecolor{InfHeaderColor1}{RGB}{41, 72, 114}
 \definecolor{InfHeaderColor2}{RGB}{96, 119, 161}
+\definecolor{InfProfileOutline}{RGB}{169, 218, 236}
 
 \newcounter{InfTroopCounter}
 \newcounter{InfProfileCounter}[InfTroopCounter]
@@ -60,6 +61,7 @@
 }
 
 
+% Creates an environment for an Infinity unit profile
 \NewEnviron{InfUnitBlock}{
     \begin{minipage}{\infunitlength\linewidth}
         \pgfdeclarelayer{background}
@@ -88,16 +90,8 @@
             
         \coordinate(REF) at (0, 0);
 
-%        \draw[color=white, fill=blue] (1.4, 1.4) rectangle ++(97, 3);
-
         \BODY
-
-%        \coordinate(Name) at (22.8, 13.1);
-
     
-%        \node[anchor=north west, opacity=0.4] at (-1, -1) {\includegraphics[width=\linewidth]{Image/IA-rokot.png}};
-%        \node[anchor=north west, opacity=0.35] at (-1, -1) {\includegraphics[width=\linewidth]{Image/IA-warcor.png}};
-%        \node[anchor=north west, opacity=0.4] at (-1, -1) {\includegraphics[width=\linewidth]{Image/IA-chernobog.png}};
         \draw[background, color=InfLineColor, fill=black, rounded corners] (REF)++(100,0) rectangle  (0, 0);
 
     \end{tikzpicture}
@@ -105,6 +99,7 @@
     \end{minipage}
 }
 
+% Adds a header for a multi-unit profile
 \newcommand{\InfTeamHeader}[2]{
     \node[white, anchor=west, scale=0.9, xscale=0.94, shift={(0.6, 1.9)}] at (REF){ISC: #1};
     \node[white, anchor=west, scale=1.07, shift={(0.4, 4.8)}] at (REF){#2};
@@ -113,6 +108,8 @@
     \node[coordinate, shift={(0, 7)}](REF) at (REF){};
 }
 
+
+% Add a new unit profile to block
 \newcommand{\InfUnitDesignators}[7]{
     \stepcounter{InfTroopCounter}
     \setsepchar{ }
@@ -163,6 +160,7 @@
 
 }
 
+% Add unit stats to profile
 \newcommand{\InfUnitStats}[3]{
     \draw[nameplate, rounded corners, fill=InfStatBackground, color=InfStatBackground,           blur shadow={shadow blur steps=10, shadow yshift=0.15em, shadow blur radius=0.5em, shadow opacity=100}] (REF)  ++(16, 15.8) rectangle ++(82, 6.2);
     \draw(REF) ++(22.4, 18.9) -- ++(71.6, 0);
@@ -208,13 +206,11 @@
     %AVA
     \node[textlayer, scale=0.85, shift={(107.2, 20.55)}] at (REF){\textbf{AVA}}; 
     \node[textlayer, scale=0.85, shift={(107.2, 23.7)}] at (REF){\textbf{\statlist[10]}};
-
-    % \node[white, anchor=west, scale=0.83, xscale=1.006, shift={(2.16, 3.73)}] at (REF){Equipment: #2};
-    % \node[white, anchor=west, scale=0.83, xscale=1.006, shift={(2.16, 3.73)}] at (REF){Special Skills: #3};
-
-%    
+    
 }
 
+% Adds skills and equipment to profile.
+%TODO Equipment handling and line overflow handling
 \newcommand{\InfUnitSkillsEquipment}[2]{
     \setsepchar{,}
     \ignoreemptyitems
@@ -234,29 +230,49 @@
     \fi
 
 }
+
+
+% Adds unit picture to profile
+%TODO add picture, and image icon below unit badge
 \newcommand{\InfUnitPicture}[0]{}
 
+% Adds profiles to the unit block. 
+%TODO create reference that updates with each profile. 
+% square corners of previous profile if counter is greater than 1
+% profile length size handling
 \newcommand{\InfUnitProfile}[0]{
     \stepcounter{InfProfileCounter}
 
     \ifnum\theInfProfileCounter=1
         %\draw[nameplate, rounded corners, fill=InfStatBackground, color=black, blur shadow={shadow blur steps=10, shadow yshift=0.15em, shadow blur radius=0.5em, shadow opacity=100}] (REF)  ++(7, 28.6) rectangle ++(91.5, 2.85);
-        \draw[nameplate, fill=blue, color=white, blur shadow={shadow blur steps=10, shadow yshift=0.15em, shadow blur radius=0.5em, shadow opacity=100}] (REF)  ++(7, 29.5) 
+        \draw[nameplate, fill=black, color=black, blur shadow={shadow blur steps=10, shadow yshift=0.15em, shadow blur radius=0.5em, shadow opacity=100}] (REF)  ++(7, 29.5) 
         arc[start angle=180, end angle=270, radius=1]
         -- ++(89.5, 0) 
         arc[start angle=-90, end angle=0, radius=1]
         -- ++(0, 2)
          -| cycle;
-    \fi
-        \draw[nameplate, fill=blue, color=white, blur shadow={shadow blur steps=10, shadow yshift=-1.15em, shadow blur radius=0.5em, shadow opacity=100}] (REF)  ++(9, 31.5) 
-%        arc[start angle=180, end angle=270, radius=1]
+        \draw[nameplate, color=InfProfileOutline] (REF)  ++(7, 29.5) 
+        arc[start angle=180, end angle=270, radius=1]
         -- ++(89.5, 0) 
-        -- ++(0, 1.5)
-        arc[start angle=0, end angle=90, radius=1]
-        -- ++(-89.5, 0) 
-        arc[start angle=90, end angle=180, radius=1]
-         |- cycle;
+        arc[start angle=-90, end angle=0, radius=1]
+        -- ++(0, 2)
+         -| cycle;
+        \node[textlayer, white, scale=0.71, shift={(14.75, 42.3)}] at (REF){Name}; 
+        \node[textlayer, white, scale=0.71, shift={(65.35, 42.5)}] at (REF){Weaponry | Equipment || Peripheral}; 
+        \node[textlayer, white, scale=0.71, shift={(104.8, 42.5)}] at (REF){Melee Weapons}; 
+        \node[textlayer, white, scale=0.71, shift={(128, 42.1)}] at (REF){SWC}; 
+        \node[textlayer, white, scale=0.71, shift={(135.5, 42.1)}] at (REF){C}; 
+
+    \fi
     
+    \draw[nameplate, fill=blue, color=white, blur shadow={shadow blur steps=10, shadow yshift=-1.15em, shadow blur radius=0.5em, shadow opacity=100}] (REF)  ++(9, 31.5) 
+    -- ++(89.5, 0) 
+    -- ++(0, 1.5)
+    arc[start angle=0, end angle=90, radius=1]
+    -- ++(-89.5, 0) 
+    arc[start angle=90, end angle=180, radius=1]
+     |- cycle;
+
 
     
         \node[coordinate, shift={(0,57.1)}](REF) at (REF){};
