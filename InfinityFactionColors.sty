@@ -1,0 +1,67 @@
+\RequirePackage{xstring}
+
+\newcommand{\InfStringYJ}{YuJing}
+\newcommand{\InfStringPanO}{PanOceania}
+\newcommand{\InfStringAriadna}{Ariadna}
+\newcommand{\InfStringHaqq}{Haqqislam}
+\newcommand{\InfStringCops}{O12}
+\newcommand{\InfStringMercs}{NA2}
+\newcommand{\InfStringNomad}{Nomads}
+\newcommand{\InfStringCA}{CombinedArmy}
+\newcommand{\InfStringAleph}{Aleph}
+\newcommand{\InfStringJSA}{JSA}
+\newcommand{\InfStringTohaa}{Tohaa}
+
+\newcommand\IfStringInList[2]{\IfSubStr{,#2,}{,#1,}}
+
+
+\newcommand{\InfSetFactionColor}[1]
+{
+	\IfSubStr
+	{\InfStringAleph,
+	\InfStringAriadna,
+	\InfStringCA,
+	\InfStringCops,
+	\InfStringHaqq,
+	\InfStringJSA,
+	\InfStringMercs,
+	\InfStringNomad,
+	\InfStringPanO,
+	\InfStringTohaa,
+	\InfStringYJ}
+	{#1}
+	{\csname FactionColor#1 \endcsname}
+	{\PackageError{infinitythelibrary}{Undefined String}{Used string does not match a defined faction string}}	
+}
+
+
+\newcommand{\InfFactionDefineColor}[3]
+{
+	\expandafter\def\csname FactionColor#1 \endcsname
+	{
+		\definecolor{InfNameplateBackground}{RGB}{#2}
+		\definecolor{InfSkillsBackground}{RGB}{#3}
+	}
+}
+
+\InfFactionDefineColor{\InfStringAriadna}{60, 124, 0}{50, 88, 45}
+
+\InfFactionDefineColor{\InfStringYJ}{255, 144, 0}{152, 85, 0}
+
+\InfFactionDefineColor{\InfStringPanO}{0, 176, 242}{0, 106, 145}
+
+\InfFactionDefineColor{\InfStringHaqq}{230, 218, 155}{138, 131, 93}
+
+\InfFactionDefineColor{\InfStringNomad}{206, 24, 31}{124,14,19}
+
+\InfFactionDefineColor{\InfStringCA}{124,14,19}{38,7,57}
+
+\InfFactionDefineColor{\InfStringAleph}{175,167,188}{105,100,113}
+
+\InfFactionDefineColor{\InfStringTohaa}{59,59,59}{37,37,37}
+
+\InfFactionDefineColor{\InfStringMercs}{114,136,104}{68,82,62}
+
+\InfFactionDefineColor{\InfStringCops}{0,84,112}{213,169,62}
+
+\InfFactionDefineColor{\InfStringJSA}{166,17,43}{117,117,117}
