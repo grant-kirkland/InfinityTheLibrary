@@ -1,5 +1,6 @@
 \RequirePackage{environ}
-\usetikzlibrary{shadows.blur}
+\usetikzlibrary{shadows.blur,fit}
+
 
 %%% see https://tex.stackexchange.com/a/419101
 %%% see https://tex.stackexchange.com/a/20426
@@ -33,6 +34,9 @@
 \definecolor{InfHeaderColor2}{RGB}{96, 119, 161}
 \definecolor{InfProfileOutline}{RGB}{169, 218, 236}
 
+\definecolor{InfHeaderColor3}{RGB}{0, 56, 94}
+\definecolor{InfHeaderColor4}{RGB}{62, 93, 128}
+
 \newcounter{InfTroopCounter}
 \newcounter{InfProfileCounter}[InfTroopCounter]
 
@@ -51,6 +55,16 @@
     color(100bp)=(InfHeaderColor1)
 }
 
+\pgfdeclarehorizontalshading{InfHeaderGradient2}{100bp}{
+	color(0bp)=(InfHeaderColor3);
+	color(25bp)=(InfHeaderColor3);
+	color(50bp)=(InfHeaderColor4);
+	color(75bp)=(InfHeaderColor3);
+	color(100bp)=(InfHeaderColor3)
+}
+
+\newcommand{\InfProfileCol}{InfHeaderGradient}
+
 \tikzmath{
     \infunitlength=0.9;
     \infweaponfontsize=8; %5-25
@@ -58,7 +72,8 @@
 
 
 % Creates an environment for an Infinity unit profile
-\NewEnviron{InfUnitBlock}{
+\NewEnviron{InfUnitBlock}
+{
     \begin{minipage}{\infunitlength\linewidth}
         \pgfdeclarelayer{background}
         \pgfdeclarelayer{nameplate}
@@ -88,6 +103,16 @@
 
         \BODY
         
+        \draw[nameplate, color=InfProfileOutline] (ProfNode.south west) arc[start angle = 180, end angle=90, radius=0.5] coordinate(arcSW);
+        \draw[nameplate, color=InfProfileOutline] (ProfNode.south east) arc[start angle = 0, end angle=90, radius=0.5] coordinate(arcSE);
+        \draw[nameplate, color=InfProfileOutline] (arcSW) -- (arcSE);
+        
+        \draw[nameplate, shading=\InfProfileCol, draw=none, blur shadow={shadow blur steps=10, shadow blur radius=0.5em, shadow opacity=100}] 
+        (ProfNode.south west)
+        -- (arcSW)
+        -- (arcSE)
+        -- (ProfNode.south east);
+        
         \node[coordinate, shift={(0,57.1)}](REF) at (REF){};
 
     
@@ -97,6 +122,9 @@
     
     \end{minipage}
 }
+
+
+
 
 % Adds a header for a multi-unit profile
 \newcommand{\InfTeamHeader}[2]{
@@ -260,41 +288,40 @@
         \node[textlayer, white, scale=0.71, shift={(104.8, 42.5)}] at (REF){Melee Weapons}; 
         \node[textlayer, white, scale=0.71, shift={(128, 42.1)}] at (REF){SWC}; 
         \node[textlayer, white, scale=0.71, shift={(135.5, 42.1)}] at (REF){C}; 
-        \node[coordinate, shift={(9,31.5)}](ProfREF) at (REF){};
-    \fi
-    \ifnum\theInfProfileCounter>1
-        \draw[nameplate, shading=InfHeaderGradient, draw=none, blur shadow={shadow blur steps=10, shadow yshift=-1.15em, shadow blur radius=0.5em, shadow opacity=100}] (ProfREF)  ++(-2, 0) 
-        -- ++(91.5, 0) 
-        -- ++(0, 2.5)
-        -- ++(-91.5, 0) 
-        |- cycle;
-        \draw[nameplate, color=InfProfileOutline] (ProfREF) ++(-2, 0) -- ++(0, 2.5);
-        \draw[nameplate, color=InfProfileOutline] (ProfREF) ++(89.5, 0) -- ++(0, 2.5);
-        \node[coordinate, shift={(0,2.5)}](ProfREF) at (ProfREF){};
-        
+        \node[coordinate, shift={(9,32.5)}](ProfREF) at (REF){};
     \fi
     
-    \node[textlayer, white, scale=0.65, anchor=north west,  name=NameText, shift={(-2.1, 0)}] at (ProfREF){#1}; 
+    \node[textlayer, white, scale=0.65, anchor=north west,  name=NameText, shift={(-1.75, 0)}] at (ProfREF){#1}; 
     \node[textlayer, white, scale=0.65, anchor=north west,  name=WeaponText, shift={(36.2, 0)}] at (ProfREF){#2}; 
     \node[textlayer, white, scale=0.65, yscale=0.92, text width=4.5cm, anchor=north west, name=MeleeText, shift={(90.5, 0)}] at (ProfREF){#3}; 
-    \node[textlayer, white, scale=0.65, anchor=north west, shift={(124.3, 0)}] at (ProfREF){#4}; 
-    \node[textlayer, white, scale=0.65, anchor=north west, shift={(133, 0)}] at (ProfREF){#5}; 
+    \node[textlayer, white, scale=0.65, anchor=north west, name=SwcText, shift={(124.3, 0)}] at (ProfREF){#4}; 
+    \node[textlayer, white, scale=0.65, anchor=north west, name=CostText, shift={(132.1, 0)},text width = 10pt, align=right] at (ProfREF){#5};
+    % create an invisible node that holds the profile entries for proper N/S sizing
+    \node[fit=(NameText)(WeaponText)(MeleeText)(SwcText)(CostText), name=ProfNode] {};
+    
+    \ifodd\theInfProfileCounter\renewcommand{\InfProfileCol}{InfHeaderGradient}
+    \else\renewcommand{\InfProfileCol}{InfHeaderGradient2}
+    \fi   
+    
+    \draw[nameplate, shading=\InfProfileCol, draw=none, blur shadow={shadow blur steps=10, shadow blur radius=0.5em, shadow opacity=100}] 
+    (ProfNode.north west)
+    -- (ProfNode.north east)
+    -- (ProfNode.south east)
+    -- (ProfNode.south west)
+    -- (ProfNode.north west);
+     
+    \draw[nameplate, color=InfProfileOutline] (ProfNode.north west) -- (ProfNode.south west);
+    \draw[nameplate, color=InfProfileOutline] (ProfNode.north east) -- (ProfNode.south east);
+ 
+    
+  
 
     \path let
-      \p1 = (MeleeText.north),
-      \p2 = (MeleeText.south)
+      \p1 = (ProfNode.north),
+      \p2 = (ProfNode.south)
     in
-      coordinate (ProfREF) at ($(ProfREF)+(0,\y2-\y1+11)$);    
-
-    \draw[nameplate, shading=InfHeaderGradient, color=black, draw=none, blur shadow={shadow blur steps=10, shadow yshift=-1.15em, shadow blur radius=0.5em, shadow opacity=100}] (ProfREF)  ++(0, -1.5) 
-    -- ++(89.5, 0) 
-    -- ++(0, 3)
-    arc[start angle=0, end angle=90, radius=1]
-    -- ++(-89.5, 0) 
-    arc[start angle=90, end angle=180, radius=1]
-     |- cycle;
-
-    \draw[nameplate, color=InfProfileOutline] (ProfREF) ++(-2, -1.5) -- ++(0, 3) arc[start angle=180, end angle=90, radius=1] -- ++(89.5, 0) arc[start angle=90, end angle=0, radius=1] -- ++(0, -3);    
+      coordinate (ProfREF) at ($(ProfREF)+(0,\y2-\y1)$);
+      
 } 
 
 \newcommand{\InfUnitTeamProfile}[0]{}
