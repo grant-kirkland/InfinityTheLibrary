@@ -302,29 +302,38 @@
 %TODO profile length size handling for all text fields
 % check even vs odd for profile coloring
 
+\newcommand{\profileDrop}{0}
+\newcommand{\profileShift}{-8.5}
+
+\newcommand{\headerShift}{-25}
+\newcommand{\headerRaise}{1}
+
 \newcommand{\InfUnitProfile}[5]{
     \stepcounter{InfProfileCounter}
 
     \ifnum\theInfProfileCounter=1
-    	\coordinate[below = 1 pt of specialPlate.south west] (REF);
-        \draw[nameplate, fill=black, color=black, blur shadow={shadow blur steps=10, shadow yshift=0.15em, shadow blur radius=0.5em, shadow opacity=100}] (REF)  ++(7, 29.5) 
+    	\coordinate[below = 8 pt of specialPlateSW] (REF);
+    	
+        \draw[nameplate, fill=black, color=black, blur shadow={shadow blur steps=10, shadow yshift=0.15em, shadow blur radius=0.5em, shadow opacity=100}] (REF)  ++(\profileShift, \profileDrop) 
         arc[start angle=180, end angle=270, radius=1]
         -- ++(89.5, 0) 
         arc[start angle=-90, end angle=0, radius=1]
         -- ++(0, 2)
          -| cycle;
-        \draw[nameplate, color=InfProfileOutline] (REF)  ++(7, 29.5) 
+         
+        \draw[nameplate, color=InfProfileOutline] (REF)  ++(\profileShift-2, \profileDrop) 
         arc[start angle=180, end angle=270, radius=1]
         -- ++(89.5, 0) 
         arc[start angle=-90, end angle=0, radius=1]
         -- ++(0, 2)
          -| cycle;
-        \node[textlayer, white, scale=0.71, shift={(14.75, 42.3)}] at (REF){Name}; 
-        \node[textlayer, white, scale=0.71, shift={(65.35, 42.5)}] at (REF){Weaponry | Equipment || Peripheral}; 
-        \node[textlayer, white, scale=0.71, shift={(104.8, 42.5)}] at (REF){Melee Weapons}; 
-        \node[textlayer, white, scale=0.71, shift={(128, 42.1)}] at (REF){SWC}; 
-        \node[textlayer, white, scale=0.71, shift={(135.5, 42.1)}] at (REF){C}; 
-        \node[coordinate, shift={(9,32.5)}](ProfREF) at (REF){};
+         
+        \node[textlayer, white, scale=0.71, shift={(14.75+\headerShift, \headerRaise)}] at (REF){Name}; 
+        \node[textlayer, white, scale=0.71, shift={(65.35+\headerShift, \headerRaise)}] at (REF){Weaponry | Equipment || Peripheral}; 
+        \node[textlayer, white, scale=0.71, shift={(104.8+\headerShift, \headerRaise)}] at (REF){Melee Weapons}; 
+        \node[textlayer, white, scale=0.71, shift={(128+\headerShift, \headerRaise)}] at (REF){SWC}; 
+        \node[textlayer, white, scale=0.71, shift={(135.5+\headerShift, \headerRaise)}] at (REF){C}; 
+        \node[coordinate, shift={(\profileShift,\profileDrop+3)}](ProfREF) at (REF){};
     \fi
     
     \node[textlayer, white, scale=0.65, anchor=north west,  name=NameText, shift={(-1.75, 0)}] at (ProfREF){#1}; 
