@@ -336,8 +336,8 @@
         \node[coordinate, shift={(\profileShift,\profileDrop+3)}](ProfREF) at (REF){};
     \fi
     
-    \node[textlayer, white, scale=0.65, anchor=north west,  name=NameText, shift={(-1.75, 0)}] at (ProfREF){#1}; 
-    \node[textlayer, white, scale=0.65, anchor=north west,  name=WeaponText, shift={(36.2, 0)}] at (ProfREF){#2}; 
+    \node[textlayer, white, scale=0.65, anchor=north west,  name=NameText, text width=5cm, shift={(-1.75, 0)}] at (ProfREF){#1}; 
+    \node[textlayer, white, scale=0.65, anchor=north west,  name=WeaponText, shift={(36.2, 0)}, text width=6cm] at (ProfREF){#2}; 
     \node[textlayer, white, scale=0.65, yscale=0.92, text width=4.5cm, anchor=north west, name=MeleeText, shift={(90.5, 0)}] at (ProfREF){#3}; 
     \node[textlayer, white, scale=0.65, anchor=north west, name=SwcText, shift={(124.3, 0)}] at (ProfREF){#4}; 
     \node[textlayer, white, scale=0.65, anchor=north west, name=CostText, shift={(132.1, 0)},text width = 10pt, align=right] at (ProfREF){#5};
