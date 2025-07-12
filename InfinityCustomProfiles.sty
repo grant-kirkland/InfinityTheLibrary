@@ -1,5 +1,6 @@
 \RequirePackage{environ}
-\usetikzlibrary{shadows.blur}
+\usetikzlibrary{shadows.blur,fit, positioning}
+
 
 %%% see https://tex.stackexchange.com/a/419101
 %%% see https://tex.stackexchange.com/a/20426
@@ -26,16 +27,15 @@
 \definecolor{InfStatBackground}{rgb}{0.9, 0.9, 0.9} 
 \definecolor{InfSkillsBackground}{rgb}{0.05, 0.35, 0.05} 
 
-\newcommand{\InfProfileAriadna}{
-    \definecolor{InfNameplateBackground}{RGB}{60, 124, 50}
-    \definecolor{InfSkillsBackground}{RGB}{50, 88, 45}
-}
 \definecolor{InfNameplateBackground}{RGB}{70, 124, 50}
 
 \definecolor{InfLineColor}{RGB}{168, 218, 236}
 \definecolor{InfHeaderColor1}{RGB}{41, 72, 114}
 \definecolor{InfHeaderColor2}{RGB}{96, 119, 161}
 \definecolor{InfProfileOutline}{RGB}{169, 218, 236}
+
+\definecolor{InfHeaderColor3}{RGB}{0, 56, 94}
+\definecolor{InfHeaderColor4}{RGB}{62, 93, 128}
 
 \newcounter{InfTroopCounter}
 \newcounter{InfProfileCounter}[InfTroopCounter]
@@ -55,6 +55,16 @@
     color(100bp)=(InfHeaderColor1)
 }
 
+\pgfdeclarehorizontalshading{InfHeaderGradient2}{100bp}{
+	color(0bp)=(InfHeaderColor3);
+	color(25bp)=(InfHeaderColor3);
+	color(50bp)=(InfHeaderColor4);
+	color(75bp)=(InfHeaderColor3);
+	color(100bp)=(InfHeaderColor3)
+}
+
+\newcommand{\InfProfileCol}{InfHeaderGradient}
+
 \tikzmath{
     \infunitlength=0.9;
     \infweaponfontsize=8; %5-25
@@ -62,20 +72,25 @@
 
 
 % Creates an environment for an Infinity unit profile
-\NewEnviron{InfUnitBlock}{
+\NewEnviron{InfUnitBlock}
+{
     \begin{minipage}{\infunitlength\linewidth}
         \pgfdeclarelayer{background}
+        \pgfdeclarelayer{backplate}
+        \pgfdeclarelayer{skillplate}
         \pgfdeclarelayer{nameplate}
         \pgfdeclarelayer{icons}
         \pgfdeclarelayer{skills}
         \pgfdeclarelayer{textlayer}
-        \pgfsetlayers{background, nameplate, main, icons, skills, textlayer}
+        \pgfsetlayers{background,backplate, skillplate, nameplate, main, icons, skills, textlayer}
     \setcounter{InfTroopCounter}{0}
     \setcounter{InfProfileCounter}{0}
     
     \begin{tikzpicture}[
         x=0.01\linewidth, y=-0.01\linewidth,
         background/.style={on layer=background},
+        backplate/.style={on layer=backplate},
+        skillplate/.style={on layer=skillplate},
         nameplate/.style={on layer=nameplate},
         icons/.style={on layer=icons},
         main/.style={layer=main},
@@ -92,6 +107,16 @@
 
         \BODY
         
+        \draw[nameplate, color=InfProfileOutline] (ProfNode.south west) arc[start angle = 180, end angle=90, radius=0.5] coordinate(arcSW);
+        \draw[nameplate, color=InfProfileOutline] (ProfNode.south east) arc[start angle = 0, end angle=90, radius=0.5] coordinate(arcSE);
+        \draw[nameplate, color=InfProfileOutline] (arcSW) -- (arcSE);
+        
+        \draw[nameplate, shading=\InfProfileCol, draw=none, blur shadow={shadow blur steps=10, shadow blur radius=0.5em, shadow opacity=100}] 
+        (ProfNode.south west)
+        -- (arcSW)
+        -- (arcSE)
+        -- (ProfNode.south east);
+        
         \node[coordinate, shift={(0,57.1)}](REF) at (REF){};
 
     
@@ -101,6 +126,9 @@
     
     \end{minipage}
 }
+
+
+
 
 % Adds a header for a multi-unit profile
 \newcommand{\InfTeamHeader}[2]{
@@ -154,10 +182,7 @@
     \node[textlayer, anchor=west, black, scale=1.075, opacity=0.1, shift={(21.6, 12.7)}] at (REF){\textbf{#2}};
     \node[textlayer, anchor=west, white, scale=1.075, shift={(21.4, 12.5)}] at (REF){\textbf{#2}};
     
-    \node[icons, shift={(15.4, 18.6)}] at (REF) {\includegraphics[width=0.125\linewidth]{#7}};
-
-    \draw[nameplate, rounded corners, fill=InfSkillsBackground, color=InfSkillsBackground, blur shadow={shadow blur steps=10, shadow yshift=0.15em, shadow blur radius=0.5em, shadow opacity=100}] (REF)  ++(15.7, 15.8) rectangle ++(81, 9.8);
-    
+    \node[icons, shift={(15.4, 18.6)}] at (REF) {\includegraphics[width=0.125\linewidth]{#7}};    
 
     \node[coordinate, shift={(0,0)}](REF) at (REF){};
 
@@ -165,73 +190,107 @@
 
 % Add unit stats to profile
 \newcommand{\InfUnitStats}[3]{
-    \draw[nameplate, rounded corners, fill=InfStatBackground, color=InfStatBackground,           blur shadow={shadow blur steps=10, shadow yshift=0.15em, shadow blur radius=0.5em, shadow opacity=100}] (REF)  ++(16, 15.8) rectangle ++(82, 6.2);
+    %\draw[nameplate, rounded corners, fill=InfStatBackground, color=InfStatBackground,           blur shadow={shadow blur steps=10, shadow yshift=0.15em, shadow blur radius=0.5em, shadow opacity=100}] (REF)  ++(16, 15.8) rectangle ++(82, 6.2);
+    % save the REF that would be used here so we can draw it later
+    \coordinate[at=(REF)](backupREF);
     \draw(REF) ++(22.4, 18.9) -- ++(71.6, 0);
     \setsepchar{ }
     \ignoreemptyitems
     \readlist\statlist{#1}
     %MOV
     \node[textlayer, scale=0.85, shift={(31.7, 20.55)}] at (REF){\textbf{MOV}}; 
-    \node[textlayer, scale=0.85, shift={(31.75, 23.7)}] at (REF){\textbf{\statlist[1]}};
+    \node[name=numMOV,textlayer, scale=0.85, shift={(31.75, 23.7)}] at (REF){\textbf{\statlist[1]}};
     
     %CC
     \node[textlayer, scale=0.85, shift={(40.8, 20.55)}] at (REF){\textbf{CC}}; 
-    \node[textlayer, scale=0.85, shift={(40.9, 23.7)}] at (REF){\textbf{\statlist[2]}};
+    \node[name=numCC,textlayer, scale=0.85, shift={(40.9, 23.7)}] at (REF){\textbf{\statlist[2]}};
     
     %BS
     \node[textlayer, scale=0.85, shift={(49.2, 20.55)}] at (REF){\textbf{BS}}; 
-    \node[textlayer, scale=0.85, shift={(49.2, 23.7)}] at (REF){\textbf{\statlist[3]}};
+    \node[name=numBS,textlayer, scale=0.85, shift={(49.2, 23.7)}] at (REF){\textbf{\statlist[3]}};
     
     %PH
     \node[textlayer, scale=0.85, shift={(57.4, 20.55)}] at (REF){\textbf{PH}}; 
-    \node[textlayer, scale=0.85, shift={(57.4, 23.7)}] at (REF){\textbf{\statlist[4]}};
+    \node[name=numPH,textlayer, scale=0.85, shift={(57.4, 23.7)}] at (REF){\textbf{\statlist[4]}};
     
     %WIP
     \node[textlayer, scale=0.85, shift={(65.8, 20.55)}] at (REF){\textbf{WIP}}; 
-    \node[textlayer, scale=0.85, shift={(65.8, 23.7)}] at (REF){\textbf{\statlist[5]}};
+    \node[name=numWIP,textlayer, scale=0.85, shift={(65.8, 23.7)}] at (REF){\textbf{\statlist[5]}};
     
     %ARM
     \node[textlayer, scale=0.85, shift={(74.1, 20.55)}] at (REF){\textbf{ARM}}; 
-    \node[textlayer, scale=0.85, shift={(74.1, 23.7)}] at (REF){\textbf{\statlist[6]}};
+    \node[name=numARM,textlayer, scale=0.85, shift={(74.1, 23.7)}] at (REF){\textbf{\statlist[6]}};
 
     %BTS
     \node[textlayer, scale=0.85, shift={(82.2, 20.55)}] at (REF){\textbf{BTS}}; 
-    \node[textlayer, scale=0.85, shift={(82.2, 23.7)}] at (REF){\textbf{\statlist[7]}};
+    \node[name=numBTS,textlayer, scale=0.85, shift={(82.2, 23.7)}] at (REF){\textbf{\statlist[7]}};
     
     %VITA
     \node[textlayer, scale=0.85, shift={(90.6, 20.55)}] at (REF){\textbf{VITA}}; 
-    \node[textlayer, scale=0.85, shift={(90.6, 23.7)}] at (REF){\textbf{\statlist[8]}};
+    \node[name=numVIT,textlayer, scale=0.85, shift={(90.6, 23.7)}] at (REF){\textbf{\statlist[8]}};
 
     %S
     \node[textlayer, scale=0.85, shift={(98.9, 20.55)}] at (REF){\textbf{S}}; 
-    \node[textlayer, scale=0.85, shift={(98.9, 23.7)}] at (REF){\textbf{\statlist[9]}};
+    \node[name=numS,textlayer, scale=0.85, shift={(98.9, 23.7)}] at (REF){\textbf{\statlist[9]}};
 
     %AVA
     \node[textlayer, scale=0.85, shift={(107.2, 20.55)}] at (REF){\textbf{AVA}}; 
-    \node[textlayer, scale=0.85, shift={(107.2, 23.7)}] at (REF){\textbf{\statlist[10]}};
+    \node[name=numAVA,textlayer, scale=0.85, shift={(107.2, 23.7)}] at (REF){\textbf{\statlist[10]}};
     
+    \node[fit = (numMOV)(numCC)(numBS)(numPH)(numWIP)(numARM)(numBTS)(numVIT)(numS)(numAVA), name=statPlate] {};
 }
 
 % Adds skills and equipment to profile.
 %TODO Equipment handling and line overflow handling
-\newcommand{\InfUnitSkillsEquipment}[2]{
-    \setsepchar{,}
-    \ignoreemptyitems
-    \readlist\skilllist{#1}
-    \readlist\equiplist{#2}
-
-    \ifnum\skilllistlen>0
-        \node[textlayer, anchor=north west, white, scale=0.65, shift={(35.2, 34.9)}] at (REF){\textbf{Special Skills:}};
+\newcommand{\InfUnitSkillsEquipment}[2]
+{
+    \coordinate (specialPlate) at (REF);
+    
+    \if\relax\detokenize{#1}\relax
+    
+    \else 
+    \node[textlayer, anchor=north west, white, scale=0.65, shift={(35.2, 34.9)}, name=skillsNode, text width = 460] at (specialPlate){\textbf{Special Skills:} #1};
+    	
+    \coordinate[below =2 pt of skillsNode.south west] (specialPlate);
+    
     \fi
-    \ifnum\skilllistlen=1
-        \node[textlayer, anchor=north west, white, scale=0.65, shift={(52.0, 34.9)}] at (REF){#1};
-    \fi
-    \ifnum\skilllistlen>1
-        \foreachitem\skill\in\skilllist[] {
-        }
-        \node[textlayer, anchor=north west, white, scale=0.65, shift={(52.0, 34.9)}] at (REF){#1};
-    \fi
-
+    
+    
+   \if\relax\detokenize{#2}\relax
+   
+   \else
+   	\node[textlayer, anchor=north west, white, scale=0.65, name=equipmentNode, text width = 460] at (specialPlate) {\textbf{Equipment:} #2};
+   	\coordinate[below=2pt of equipmentNode] (specialPlate);
+   \fi
+   
+   \coordinate[below=2pt of specialPlate] (specialPlate);
+   
+   \path let
+   \p1 = (statPlate)
+   in
+   coordinate (specialPlateNW) at (18, \y1-6);
+   
+   \path let
+   	\p1 = (specialPlate.south)
+   in
+   	coordinate (specialPlateSW) at (18, \y1);
+   	
+   \path let
+	\p1 = (statPlate)
+	in
+	coordinate (specialPlateNE) at (96, \y1-6);
+   	
+   	\path let
+   	\p1 = (specialPlate.south)
+   	in
+   	coordinate (specialPlateSE) at (96, \y1);
+    
+    \draw[nameplate, rounded corners, fill=InfSkillsBackground, color=InfSkillsBackground] (specialPlateNW)  -- (specialPlateSW) --(specialPlateSE) -- (specialPlateNE) -- (specialPlateNW);
+    
+    % redraw the stat plate so that it is on top - i wanted to do this with layers but there were a few problems
+    
+    \draw[nameplate, rounded corners, fill=InfStatBackground, color=InfStatBackground,           blur shadow={shadow blur steps=10, shadow yshift=0.15em, shadow blur radius=0.5em, shadow opacity=100}] (backupREF)  ++(16, 15.8) rectangle ++(82, 6.2);
+    
 }
 
 
@@ -242,63 +301,72 @@
 % Adds profiles to the unit block. 
 %TODO profile length size handling for all text fields
 % check even vs odd for profile coloring
+
+\newcommand{\profileDrop}{0}
+\newcommand{\profileShift}{-8.5}
+
+\newcommand{\headerShift}{-25}
+\newcommand{\headerRaise}{1}
+
 \newcommand{\InfUnitProfile}[5]{
     \stepcounter{InfProfileCounter}
 
     \ifnum\theInfProfileCounter=1
-        %\draw[nameplate, rounded corners, fill=InfStatBackground, color=black, blur shadow={shadow blur steps=10, shadow yshift=0.15em, shadow blur radius=0.5em, shadow opacity=100}] (REF)  ++(7, 28.6) rectangle ++(91.5, 2.85);
-        \draw[nameplate, fill=black, color=black, blur shadow={shadow blur steps=10, shadow yshift=0.15em, shadow blur radius=0.5em, shadow opacity=100}] (REF)  ++(7, 29.5) 
+    	\coordinate[below = 8 pt of specialPlateSW] (REF);
+    	
+        \draw[nameplate, fill=black, color=black, blur shadow={shadow blur steps=10, shadow yshift=0.15em, shadow blur radius=0.5em, shadow opacity=100}] (REF)  ++(\profileShift, \profileDrop) 
         arc[start angle=180, end angle=270, radius=1]
         -- ++(89.5, 0) 
         arc[start angle=-90, end angle=0, radius=1]
         -- ++(0, 2)
          -| cycle;
-        \draw[nameplate, color=InfProfileOutline] (REF)  ++(7, 29.5) 
+         
+        \draw[nameplate, color=InfProfileOutline] (REF)  ++(\profileShift-2, \profileDrop) 
         arc[start angle=180, end angle=270, radius=1]
         -- ++(89.5, 0) 
         arc[start angle=-90, end angle=0, radius=1]
         -- ++(0, 2)
          -| cycle;
-        \node[textlayer, white, scale=0.71, shift={(14.75, 42.3)}] at (REF){Name}; 
-        \node[textlayer, white, scale=0.71, shift={(65.35, 42.5)}] at (REF){Weaponry | Equipment || Peripheral}; 
-        \node[textlayer, white, scale=0.71, shift={(104.8, 42.5)}] at (REF){Melee Weapons}; 
-        \node[textlayer, white, scale=0.71, shift={(128, 42.1)}] at (REF){SWC}; 
-        \node[textlayer, white, scale=0.71, shift={(135.5, 42.1)}] at (REF){C}; 
-        \node[coordinate, shift={(9,31.5)}](ProfREF) at (REF){};
-    \fi
-    \ifnum\theInfProfileCounter>1
-        \draw[nameplate, shading=InfHeaderGradient, draw=none, blur shadow={shadow blur steps=10, shadow yshift=-1.15em, shadow blur radius=0.5em, shadow opacity=100}] (ProfREF)  ++(-2, 0) 
-        -- ++(91.5, 0) 
-        -- ++(0, 2.5)
-        -- ++(-91.5, 0) 
-        |- cycle;
-        \draw[nameplate, color=InfProfileOutline] (ProfREF) ++(-2, 0) -- ++(0, 2.5);
-        \draw[nameplate, color=InfProfileOutline] (ProfREF) ++(89.5, 0) -- ++(0, 2.5);
-        \node[coordinate, shift={(0,2.5)}](ProfREF) at (ProfREF){};
-        
+         
+        \node[textlayer, white, scale=0.71, shift={(14.75+\headerShift, \headerRaise)}] at (REF){Name}; 
+        \node[textlayer, white, scale=0.71, shift={(65.35+\headerShift, \headerRaise)}] at (REF){Weaponry | Equipment || Peripheral}; 
+        \node[textlayer, white, scale=0.71, shift={(104.8+\headerShift, \headerRaise)}] at (REF){Melee Weapons}; 
+        \node[textlayer, white, scale=0.71, shift={(128+\headerShift, \headerRaise)}] at (REF){SWC}; 
+        \node[textlayer, white, scale=0.71, shift={(135.5+\headerShift, \headerRaise)}] at (REF){C}; 
+        \node[coordinate, shift={(\profileShift,\profileDrop+3)}](ProfREF) at (REF){};
     \fi
     
-    \node[textlayer, white, scale=0.65, anchor=north west,  name=NameText, shift={(-2.1, 0)}] at (ProfREF){#1}; 
-    \node[textlayer, white, scale=0.65, anchor=north west,  name=WeaponText, shift={(36.2, 0)}] at (ProfREF){#2}; 
+    \node[textlayer, white, scale=0.65, anchor=north west,  name=NameText, text width=5cm, shift={(-1.75, 0)}] at (ProfREF){#1}; 
+    \node[textlayer, white, scale=0.65, anchor=north west,  name=WeaponText, shift={(36.2, 0)}, text width=6cm] at (ProfREF){#2}; 
     \node[textlayer, white, scale=0.65, yscale=0.92, text width=4.5cm, anchor=north west, name=MeleeText, shift={(90.5, 0)}] at (ProfREF){#3}; 
-    \node[textlayer, white, scale=0.65, anchor=north west, shift={(124.3, 0)}] at (ProfREF){#4}; 
-    \node[textlayer, white, scale=0.65, anchor=north west, shift={(133, 0)}] at (ProfREF){#5}; 
+    \node[textlayer, white, scale=0.65, anchor=north west, name=SwcText, shift={(124.3, 0)}] at (ProfREF){#4}; 
+    \node[textlayer, white, scale=0.65, anchor=north west, name=CostText, shift={(132.1, 0)},text width = 10pt, align=right] at (ProfREF){#5};
+    % create an invisible node that holds the profile entries for proper N/S sizing
+    \node[fit=(NameText)(WeaponText)(MeleeText)(SwcText)(CostText), name=ProfNode] {};
+    
+    \ifodd\theInfProfileCounter\renewcommand{\InfProfileCol}{InfHeaderGradient}
+    \else\renewcommand{\InfProfileCol}{InfHeaderGradient2}
+    \fi   
+    
+    \draw[nameplate, shading=\InfProfileCol, draw=none, blur shadow={shadow blur steps=10, shadow blur radius=0.5em, shadow opacity=100}] 
+    (ProfNode.north west)
+    -- (ProfNode.north east)
+    -- (ProfNode.south east)
+    -- (ProfNode.south west)
+    -- (ProfNode.north west);
+     
+    \draw[nameplate, color=InfProfileOutline] (ProfNode.north west) -- (ProfNode.south west);
+    \draw[nameplate, color=InfProfileOutline] (ProfNode.north east) -- (ProfNode.south east);
+ 
+    
+  
 
     \path let
-      \p1 = (MeleeText.north),
-      \p2 = (MeleeText.south)
+      \p1 = (ProfNode.north),
+      \p2 = (ProfNode.south)
     in
-      coordinate (ProfREF) at ($(ProfREF)+(0,\y2-\y1+11)$);    
-
-    \draw[nameplate, shading=InfHeaderGradient, color=black, draw=none, blur shadow={shadow blur steps=10, shadow yshift=-1.15em, shadow blur radius=0.5em, shadow opacity=100}] (ProfREF)  ++(0, -1.5) 
-    -- ++(89.5, 0) 
-    -- ++(0, 3)
-    arc[start angle=0, end angle=90, radius=1]
-    -- ++(-89.5, 0) 
-    arc[start angle=90, end angle=180, radius=1]
-     |- cycle;
-
-    \draw[nameplate, color=InfProfileOutline] (ProfREF) ++(-2, -1.5) -- ++(0, 3) arc[start angle=180, end angle=90, radius=1] -- ++(89.5, 0) arc[start angle=90, end angle=0, radius=1] -- ++(0, -3);    
+      coordinate (ProfREF) at ($(ProfREF)+(0,\y2-\y1)$);
+      
 } 
 
 \newcommand{\InfUnitTeamProfile}[0]{}

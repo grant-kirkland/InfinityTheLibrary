@@ -8,6 +8,7 @@
 \usepackage{amsmath}
 \usepackage{changepage}
 
+
 \title{InfLibrary - V0.1}
 \author{Falx - V0116}
 \date{December 2024}
@@ -32,44 +33,25 @@
 
 % ROKOT
 \begin{InfUnitBlock}
-    \InfProfileAriadna
+    \InfSetFactionColor{Ariadna}
     \InfUnitDesignators{Rokots}{ROKOTS}{Line Troops}{LI}{kosmo Ariadna}{regular}{Image/rokots.png}
-    \InfUnitStats{4-4 14 10 18 13 8 6 1 2 5}{}{}
-    \InfUnitSkillsEquipment{Courage}{ }
-    \InfUnitNotes
+    \InfUnitStats{4-4 14 10 11 13 1 0 1 2 2}{}{}
+    \InfUnitSkillsEquipment{Bork  \infdot Bork2 Bork Bork Bork Bork Bork Bork Bork Bork Bork Bork Bork Bork Bork Bork Bork}{}
+    \InfUnitProfile{Rokot}{Submachine Gun, Grenades, D-Charges}{Pistol, CC Weapon}{0}{9}
+    \InfUnitProfile{Rokot (Forward Observer)}{Flash Pulse, Grenades, D-Charges}{Pistol, CC Weapon}{0}{10}
     
-    \node[anchor=north west, opacity=0.35] at (-1, -1) {\includegraphics[width=\linewidth]{Image/IA-rokot.png}};
+    %\node[anchor=north west, opacity=0.35] at (-1, -1) {\includegraphics[width=\linewidth]{Image/IA-rokot.png}};
 
 \end{InfUnitBlock}
-
-POLARIS TEAM
-
+\\
 \begin{InfUnitBlock}
-    \InfProfileAriadna
-    \InfTeamHeader{Polaris Team}{POLARIS TEAM}
-    \InfUnitDesignators{Masha, Polaris Handler}{MASHA, Polaris Handler}{Support Troops}{LI}{kosmo Ariadna}{regular}{Image/polaris.png}
-    \InfUnitStats{4-4 14 11 11 13 2 0 1 2 2}{}{}
-    %\InfUnitSkillsEquipment{}{}
-    \InfUnitProfile{}{}{}{}{}
-    \InfUnitNotes
-    \InfUnitDesignators{Polaris Bearpode}{POLARIS BEARPODE}{Support Troops}{WB}{kosmo Ariadna}{regular}{Image/polaris.png}
-    \InfUnitStats{6-4 24 7 16 12 4 3 2 6 2}{}{}
-    \InfUnitSkillsEquipment{Berserk \infdot Climbing Plus \infdot Courage \infdot Dogged \infdot Immunity ( ARM ) \infdot No Cover}{ }
-    \InfUnitProfile{}{}{}{}{}
-    \InfUnitNotes
-    \node[anchor=north west, opacity=0.35] at (-1, -1) {\includegraphics[width=\linewidth]{Image/IA-polaris.png}};
-
-\end{InfUnitBlock}
-
-WARCOR
-
-\begin{InfUnitBlock}
-    \InfProfileAriadna
+    \InfSetFactionColor{YuJing}
     \InfUnitDesignators{Warcors, War Correspondents}{WARCORS, WAR CORRESPONDENTS}{Mercenary Troops}{LI}{wc dahshat ikari druze oss steel aleph tunguska bakunin corregidor nomads ramah qk hassassin haqq kosmo tartary usarf ariadna wb invincible imperial yj kcf wf mo pano oban shindenbutai jsa torchlight starmada o12}{cube irregular}{Image/warcors.png}
     \InfUnitStats{4-4 4 4 11 18 0 0 1 2 1}{}{}
-    \InfUnitSkillsEquipment{Journalist L1}{ }
+    \InfUnitSkillsEquipment{Journalist L1}{Bork}
     \InfUnitProfile{WARCOR (360$^\circ$ Visor)}{Hyper-Rapid Magnetic Cannon}{Stun Pistol, Monofilament CC Weapon}{0}{3}
     \InfUnitProfile{WARCOR (Sixth Sense)}{Hyper-Rapid Magnetic Cannon}{Stun Pistol, Monofilament CC Weapon}{0}{3}
+    \InfUnitProfile{WARCOR (Combat Jump)}{Hyper-Rapid Magnetic Cannon}{Stun Pistol, Monofilament CC Weapon, PARA CC Weapon (-3)}{0}{3}
 %    \node[anchor=north west, opacity=0.35] at (-1, -1) {\includegraphics[width=\linewidth]{Image/IA-warcor.png}};
     %\InfUnitNotes
 \end{InfUnitBlock}
