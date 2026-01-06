@@ -1,0 +1,125 @@
+name: Sync Infinity Army metadata
+
+on:
+  schedule:
+    - cron: "43 21 * * 0"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  sync: 
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Restore Infinity ETag cache
+        uses: actions/cache@v4
+        with:
+          path: .cache/etag
+          key: infinity-etags-v1
+          restore-keys: |
+            infinity-etags-
+
+      - name: Ensure jq
+        run: |
+          jq --version || (sudo apt-get update && sudo apt-get install -y jq)
+          
+      - name: Fetch metadata and faction data with ETAG caching
+        run: |
+          set -euo pipefail
+          mkdir -p data/infinity
+          mkdir -p data/infinity/factions
+          mkdir -p .cache/etag/factions
+
+          ORIGIN_HDR=(-H "Origin: https://infinityuniverse.com")
+
+          fetch_json_with_etag () {
+            local url="$1"
+            local out="$2"
+            local etag_file="$3"
+
+            local hdr=("${ORIGIN_HDR[@]}")
+            if [ -f "$etag_file" ]; then
+              hdr+=(-H "If-None-Match: $(cat "$etag_file")")
+            fi
+
+            local tmp_raw="${out}.raw.tmp"
+            local tmp_formatted="${out}.fmt.tmp"
+            local headers_tmp="$(mktemp)"
+
+            local code
+            code="$(curl -sS -L \
+              "${hdr[@]}" \
+              -D "$headers_tmp" \
+              -o "$tmp_raw" \
+              -w "%{http_code}" \
+              "$url")"
+
+            if [ "$code" = "304" ]; then
+              echo "$(basename "$out") Not modified."
+              rm -f "$tmp_raw" "$headers_tmp" "$tmp_formatted"
+              return 0
+            fi
+
+            if [ "$code" != "200" ]; then
+              echo "Fetch failed: $url (HTTP $code)"
+              cat "$headers_tmp" || true
+              rm -f "$tmp_raw" "$headers_tmp" "$tmp_formatted"
+              return 1
+            fi
+
+            jq . "$tmp_raw" > "$tmp_formatted"
+            mv "$tmp_formatted" "$out"
+
+            local new_etag
+            new_etag="$(grep -i '^etag:' "$headers_tmp" | head -n1 | cut -d' ' -f2- | tr -d '\r' || true)"
+            if [ -n "$new_etag" ]; then
+              echo -n "$new_etag" > "$etag_file"
+            fi
+
+            rm -f "$tmp_raw" "$headers_tmp" "$tmp_formatted"
+            return 0
+          }
+
+          # --- 1) Metadata ---
+          META_URL="https://api.corvusbelli.com/army/infinity/en/metadata"
+          META_OUT="data/infinity/metadata.json"
+          META_ETAG=".cache/etag/metadata.etag"
+          
+          fetch_json_with_etag "$META_URL" "$META_OUT" "$META_ETAG" || exit 1
+
+          # --- 2) Factions ---
+          jq -r '.factions[]
+            | "\(.id)\t\(.slug)"' "$META_OUT" \
+          | while IFS=$'\t' read -r id slug; do
+              # Basic filename hygiene
+              safe_slug="$(echo "$slug" | tr -cd 'a-z0-9-')"
+              out="data/infinity/factions/${id}-${safe_slug}.json"
+              etag=".cache/etag/factions/${id}.etag"
+
+              url="https://api.corvusbelli.com/army/units/en/${id}"
+
+              echo "Fetching faction ${id} (${safe_slug})..."
+              if ! fetch_json_with_etag "$url" "$out" "$etag"; then
+                echo "WARN: failed faction ${id} (${safe_slug})" >&2
+              fi
+            done
+
+
+      - name: Commit changes
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          git add data/infinity
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+            exit 0
+          fi
+
+          git commit -m "Sync Infinity Army metadata"
+          git push
